@@ -1,20 +1,20 @@
-# TITLE
+# PRINTF
 A little about the directory
 
 ## Table of Content
 - [Progress](#progress)
 - [Resources](#resources)
 - [Tasks](#tasks)
- - [Mandatory Tasks](#mandatory-tasks)
- - [Advanced Tasks](#advanced-tasks)
-- [Author](#author)
+  - [Mandatory Tasks](#mandatory-tasks)
+  - [Advanced Tasks](#advanced-tasks)
+- [Authors](#authors)
 
 ## Progress
 - [ ] Mandatory Tasks
- - [ ] Task 0
- - [ ] Task 1
+  - [ ] Task 0
+  - [ ] Task 1
 - [ ] Advanced Tasks
- - [ ] Task 100
+  - [ ] Task 100
 
 ## Resources
 > - [First resource]()
