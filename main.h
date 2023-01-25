@@ -1,27 +1,60 @@
-#ifndef _MAIN_H_
-#define _MAIN_H_
+#ifndef _HOLBERTON_H_
+#define _HOLBERTON_H_
 
-int _printf(const char *format, ...);
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
+#include <unistd.h>
+
 /**
- * struct modifiers - struct modifiers
- * @mod: modifier
- * @fun: respective function
- */
-typedef struct modifiers
+* struct storage - structure that holds information on the buffer
+* @size: holds the size to write from the buffer
+* @box: pointer to the array
+* @start: pointer to the beginning of the array, will not be modified
+*/
+typedef struct storage
 {
-	char mod;
-	void (*fun)(unsigned int *, ...);
-} mod_fun;
-void (*get_mod_fun(char c))(unsigned int *n, ...);
-int get_type(char c);
-void print_char(unsigned int *, ...);
-void print_str(unsigned int *, ...);
-void print_int(unsigned int *, ...);
-void print_bin(unsigned int *, ...);
-void print_uint(unsigned int *n, ...);
-void print_oct(unsigned int *n, ...);
-void print_hex(unsigned int *n, ...);
-void print_hex_caps(unsigned int *n, ...);
-void print_adr(unsigned int *n, ...);
+	int size;
+	char *box;
+	char *start;
+} mk_buffer;
 
-#endif
+/**
+* struct format - a structure that holds the string to be printed and a format
+* checker function pointer
+* @format: holds the string to print
+* @f: a function pointer
+*/
+typedef struct format
+{
+	char *format;
+	mk_buffer(*f)(mk_buffer, va_list);
+} format_t;
+
+/* Essential functions */
+int _printf(const char *format, ...);
+
+/* Conversion specifier functions */
+mk_buffer(*get_format(const char *format))(mk_buffer, va_list);
+mk_buffer char_fmt(mk_buffer, va_list args);
+mk_buffer str_fmt(mk_buffer, va_list args);
+mk_buffer int_fmt(mk_buffer, va_list args);
+mk_buffer rev_fmt(mk_buffer, va_list args);
+mk_buffer rot13_fmt(mk_buffer buffer, va_list args);
+mk_buffer upp_hex_fmt(mk_buffer buffer, va_list args);
+mk_buffer low_hex_fmt(mk_buffer buffer, va_list args);
+mk_buffer space_fmt(mk_buffer container, const char *format, va_list args);
+mk_buffer default_fmt(mk_buffer container, const char *format);
+mk_buffer nl_fmt(mk_buffer buff, va_list var);
+mk_buffer spc_fmt(mk_buffer buff, va_list var);
+
+/* Helper functions */
+unsigned int _strlen(char *str);
+mk_buffer rec_digits(int, mk_buffer);
+mk_buffer create_buffer(mk_buffer);
+mk_buffer add_buff(mk_buffer buff, va_list var, const char *fmt, char custom);
+void check_null(const char *);
+int is_printable(int);
+char *cvrt_upper_hex(int i);
+mk_buffer cap_s_fmt(mk_buffer buff, va_list var);
+#endif /* _HOLBERTON_H_ */

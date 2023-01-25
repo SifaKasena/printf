@@ -1,0 +1,366 @@
+# ~/.profile: executed by the command interpreter for login shells.
+# This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
+# exists.
+# see /usr/share/doc/bash/examples/startup-files for examples.
+# the files are located in the bash-doc package.
+
+# the default umask is set in /etc/profile; for setting the umask
+# for ssh logins, install and configure the libpam-umask package.
+#umask 022
+
+ # if running bash
+ if [ -n "$BASH_VERSION" ]; then
+     # include .bashrc if it exists
+     if [ -f "$HOME/.bashrc" ]; then
+         . "$HOME/.bashrc"
+     fi
+ fi
+
+ # set PATH so it includes user's private bin if it exists
+ if [ -d "$HOME/bin" ] ; then
+     PATH="$HOME/bin:$PATH"
+ fi
+
+export PATH=/usr/local/bin:$PATH
+
+#alias
+alias ..="cd .."
+alias ..l="cd .. && ls"
+alias ep="vim ~/.profile"
+alias sp="source ~/.profile"
+alias cdh="cd ~/holbertonschool-higher_level_programming && ls"
+alias lc="cd $1 && ls"
+alias gp="git push"
+alias gs="git status"
+alias gr="git rm"
+alias ga="git add"
+alias gc="git commit"
+alias gb="git branch"
+alias gbb="git checkout master"
+alias gch="git checkout"
+alias gh="git log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%an %cr)%Creset' --abbrev-commit --date=relative"
+alias qa="find ./ -name "qa.txt" -exec grep ' ' {} + | cut -d ':' -f2"
+#alias qaa="grep -nv ^[0-9] qa.txt"
+#alias qaq="grep ^[0-9] qa.txt"
+alias qaa="find ./ -name "qa.txt" -exec grep -v ^[0-9] {} + | cut -d ':' -f2"
+alias qaq="find ./ -name 'qa.txt' -exec grep ^[0-9] {} + | cut -d ':' -f2"
+#Note Change the author  on line 68
+#creates a README template
+nr() {
+  #creates template
+  echo "Enter title: "
+  read title
+  echo "#$title" > README.md
+  echo "---" >> README.md
+  echo "## Description" >> README.md
+  echo "
+This project in the low_level_programming series is about:
+" >> README.md
+  cat <<EOF
+EOF >> README.md
+---
+## Description
+#Enter your description here
+EOF
+  echo "Type decription, Ctrl+D to end"
+  cat >> README.md
+  cat <<EOF
+EOF >> README.md
+---
+EOF
+#this will append * to your description
+#6 being the line to start on, $=EOF, &=append match,^.* = match
+   sed -i '7,$s/^.*$/*&\n/' README.md
+echo "---
+File|Task
+---|---" >> README.md
+# Here users can create just the task or task and answer || cancel
+    echo "enter 1 || 2 : onlyTask = 1, task and description = 2"
+    echo "00 = cancel"
+    echo "Special Case: Create files"
+    echo "Enter 11: task + files"
+    echo "Enter 22: task + answer + files"
+    read ans
+    while [[ $ans != @(1|2|00||11|22) ]]
+    do
+        echo "enter 1 || 2 : onlyTask = 1, task and description = 2"
+        echo "00 = cancel ; else I will ask again"
+        echo "Special Case: Create files"
+        echo "Enter 11: task + files"
+        echo "Enter 22: task + answer + files"
+        read ans
+    done
+#00 will delete the README
+    if (($ans == 00)); then
+        rm ./README.md
+        echo "I have deleted ./README.md. Have a nice day"
+        return 0;
+    fi
+    echo "How many tasks are there?"
+    read number
+#1 will just input the task
+    if (($ans == 1 || $ans == 11)); then
+        for ((i = 1; i <= number; i++))
+        do
+            echo "Type in task title"
+            read task
+            echo "$task | " >> README.md
+            if (($ans == 11)); then
+               mkPy $task
+            fi
+        done
+#2 will do both task and description
+    elif (($ans == 2 || $ans == 22)); then
+        for ((i = 1; i <= number; i++))
+        do
+            echo "Type in task title"
+            read task
+            echo "Type in the description of the task or answer"
+            read answer
+            if (($ans == 22)); then
+				if [ "$task" = "c" ]; then
+					read task
+					mkC $task
+				elif [ "$task" = "py" ]; then
+					mkPy $task
+				else
+					mkF $task
+				fi
+            echo "$task | $answer" >> README.md
+            fi
+        done
+    fi
+    echo "
+## Author" >>README.md
+echo " Shoji Takashima" >> README.md # EDIT ME
+cat README.md
+chmod u+x *.py
+askCommit
+}
+
+askCommit() {
+    echo "Enter: <enter> : to git commit, 00 to quit, 1 to delete the README"
+    read ans
+    while [[ $ans != @(""|00|1) ]]
+    do
+        echo "Enter: <enter> : to git commit, 00 to quit, 1 to delete the README"
+        read ans
+    done
+
+if (($ans == 00)); then
+  return 0
+elif (($ans == 1)); then
+    rm ./README.md
+    echo "I have deleted ./README.md. Have a nice day"
+    return 0;
+else
+    git add ./README.md
+    git commit -m "Added README.md"
+    git push origin master
+fi
+}
+
+
+#calls both betty
+##
+##betty()
+##{
+#	echo "betty-doc"
+#	echo "---------"
+#	betty-doc $1
+#	echo ""
+#	echo "betty-style"
+#	echo "-----------"
+#	betty-style $1
+#}
+
+#shorthand for git commit and git push
+gcp()
+{
+	git add $1 $2 $3 $4 $5
+	git status
+	echo "Type in message"
+	read message
+	git commit -m "$message"
+	gp
+}
+
+#shorthand to stage all files and confirms if you want to commit and push
+gca()
+{
+	git add ./
+	git status
+	echo "Do you want to commit all?"
+	echo "press <enter>"
+	echo "$1"
+	read ans
+	echo "$1"
+	echo "$ans"
+	if (($ans == '1')); then
+		echo "aborting commit"
+		return
+	fi
+	echo "enter message: "
+	read message
+	echo "$message"
+	git commit -m "$message"
+	gp
+}
+
+crfile()
+{
+	touch $1
+	chmod u+x ./$1
+}
+
+#adds code to specific lines in the file
+editf()
+{
+	sed -i $2i$3 $1 #2 line and message and file
+}
+#Creates a python template
+mkPy()
+{
+	echo "#!/usr/bin/python3" > $1
+	echo "'''" >> $1
+}
+
+mkTxt()
+{
+	touch $1
+}
+
+
+#creates a C template
+mkCmain()
+{
+	echo "#include <stdio.h>" > $1
+	echo "#include \"holberton.h\"">> $1
+	echo "" >> $1
+	echo "/**
+* main - Entry point
+*
+* Return: Always 0 (Success)
+*/
+" >> $1
+	echo "int main(void)
+{
+
+	return (0);
+}" >> $1
+}
+#creates a c template
+mkC()
+{
+	echo "#include <stdio.h>" > $1
+	echo "#include <stdlib.h>">> $1
+	echo "#include \"holberton.h\"">> $1
+	echo "" >> $1
+	echo "/**
+*
+*
+*/
+" >> $1
+	echo "()
+{
+
+	return (0);
+}" >> $1
+}
+
+mkF()
+{
+	touch $1
+}
+#compiles using options and output main
+gcca()
+{
+	gcc -Wall -Wextra -Werror -pedantic *.c -o main
+}
+gccs()
+{
+	gcc -Wall -Wextra -Werror -pedantic $1 $2 $3 $4 $5 $6 $7 $8 $9-o main
+}
+
+#changes and lists to the next directory
+cdl()
+{
+	builtin cd "$@" && ls
+}
+
+#Removes files and stores the file name into removedfiles.txt
+rf()
+{
+	rm $1 $2 $3 $4 $5 $6 $7 $8 $9
+	echo "$1 $2 $3 $4 $5 $6 $7 $8 $9" > removedfiles.txt
+	gs
+	echo "removedfiles______________"
+	cat removedfiles.txt
+}
+mkQA()
+{
+	echo "How many questions"
+	read counter
+	i=0
+	echo "Questions And Answers
+----------------------" > qa.txt
+	while [ $counter -gt $i ]
+	do
+		i=$[$i+1]
+		echo "$i
+	($i)-" >> qa.txt
+	done
+}
+addQA()
+{
+	echo "How many questions"
+	read counter
+	i=0
+	echo "" >> qa.txt
+	echo "Extended Questions And Answers
+--------------------------" >> qa.txt
+	while [ $counter -gt $i ]
+	do
+		i=$[$i+1]
+		echo "$i 
+	($i)-" >> qa.txt
+	done
+}
+
+#copy test of valgrind functions to see
+function vgrun
+{
+  local COMMAND="$1"
+  local NAME="$2"
+  [[ -n "$COMMAND" ]] || { echo "Syntax: vgrun <command> <name>"; return; }
+  [[ -n "$NAME" ]] || { echo "Syntax vgrun <command> <name>"; return; }
+  valgrind \
+        --leak-check=full --error-limit=no --track-origins=yes \
+        --undef-value-errors=yes --log-file=valgrind-${NAME}.log \
+        --read-var-info=yes \
+        $COMMAND | tee valgrind-${NAME}-output.log 2>&1
+}
+
+function vgtrace
+{
+  local COMMAND="$1"
+  local NAME="$2"
+  [[ -n "$COMMAND" ]] || { echo "Syntax: vgtrace <command> <name>"; return; }
+  [[ -n "$NAME" ]] || { echo "Syntax vgtrace <command> <name>"; return; }
+  valgrind \
+        --leak-check=full --error-limit=no --track-origins=yes \
+        --undef-value-errors=yes --log-file=valgrind-${NAME}.log \
+        --read-var-info=yes --trace-children=yes \
+        $COMMAND | tee valgrind-${NAME}-output.log 2>&1
+}
+
+function vgdbg
+{
+  [[ -n "$*" ]] || { echo "Syntax: vgrun <command>"; return; }
+  valgrind \
+        --leak-check=full --error-limit=no --track-origins=yes \
+        --undef-value-errors=yes --read-var-info=yes --db-attach=yes \
+        "$@"
+}
+
+eval $(/home/linuxbrew/.linuxbrew/bin/brew shellenv)
