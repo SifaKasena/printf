@@ -35,7 +35,7 @@ int _printf(const char *format, ...)
 					break;
 				case 's':
 					s = va_arg(ptr, char *);
-					write(1, s, strlen(s) + 1);
+					write(1, s, strlen(s));
 					break;
 				default:
 					break;
