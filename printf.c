@@ -12,7 +12,7 @@
 
 int _printf(const char *format, ...)
 {
-	unsigned int n, i;
+	unsigned int n, i, type;
 	va_list ptr;
 
 	n = i = 0;
@@ -27,22 +27,21 @@ int _printf(const char *format, ...)
 		else
 		{
 			i++;
-			switch (format[i])
+			type = get_type(format[i]);
+			switch (type)
 			{
-				case '%':
+				case 0:
 					write(1, format + i, 1);
+					n++;
 					break;
-				case 'c':
-					print_char(&n, va_arg(ptr, int));
+				case 1:
+					get_mod_fun(format[i])(&n, va_arg(ptr, int));
 					break;
-				case 's':
-					print_str(&n, va_arg(ptr, char *));
-					break;
-				case 'd':
-				case 'i':
-					print_int(&n, va_arg(ptr, int));
+				case 2:
+					get_mod_fun(format[i])(&n, va_arg(ptr, void *));
 					break;
 				default:
+					write(1, format + i - 1, 2);
 					break;
 			}
 		}
