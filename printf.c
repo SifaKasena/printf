@@ -1,51 +1,90 @@
-#include "main.h"
-#include <unistd.h>
-#include <stdarg.h>
+#include "holberton.h"
+
+int write_print(mk_buffer container, va_list args);
 
 /**
- * _printf - custom printf function
- * @format: charcter string composed of 0 or more directives of
- * what _printf should print
- * Return: number of bytes printed excluding the null byte
+ * _printf - Creates a buffer and writes that buffer to standard output
+ * @format: the string to be printed, may contain conversion specifiers
+ * which placehold for other data types to be printed
+ *
+ * Return: The number of characters printed.
  */
-
 int _printf(const char *format, ...)
 {
-	unsigned int n, i, type;
-	va_list ptr;
+	va_list args;
+	mk_buffer container;
 
-	n = i = 0;
-	va_start(ptr, format);
-	while (format[i] != '\0')
+	check_null(format);
+	container = create_buffer(container);
+	va_start(args, format);
+	while (*format)
 	{
-		if (format[i] != '%')
+		if (*format == '%' && get_format(format + 1))
 		{
-			write(1, format + i, 1);
-			n++;
+			if (!(get_format(format + 1)))
+			{
+				container = add_buff(container, args, format, 0);
+					format++;
+				continue;
+			}
+			while (*(format + 1) == ' ')
+				format++;
+			if (*(format + 1) == '\0')
+			{
+				format++;
+				continue;
+			}
+			else if (*(format + 1) == '\n' && *format == '%')
+			{
+				container = add_buff(container, args, 0, '%');
+				format++;
+				continue;
+			}
+			if (*(format + 1) && !(get_format(format + 1)))
+			{
+				container = add_buff(container, args, 0, '%');
+				container = add_buff(container, args, format, 0);
+				format++;
+				continue;
+			}
+			else if (*format == ' ')
+				container = add_buff(container, args, format, 0);
+			format++;
+			container = get_format(format)(container, args);
+		}
+		else if (*format == '%' && *(format + 1) == '\0')
+		{
+			write(1, container.start, container.size);
+			free(container.start);
+			va_end(args);
+
+			return (-1);
 		}
 		else
 		{
-			i++;
-			type = get_type(format[i]);
-			switch (type)
-			{
-				case 0:
-					write(1, format + i, 1);
-					n++;
-					break;
-				case 1:
-					get_mod_fun(format[i])(&n, va_arg(ptr, int));
-					break;
-				case 2:
-					get_mod_fun(format[i])(&n, va_arg(ptr, void *));
-					break;
-				default:
-					write(1, format + i - 1, 2);
-					break;
-			}
+			if (*(format + 1) == '%' && *format == '%')
+				format++;
+			*container.box = *format;
+			container.size += 1;
 		}
-		i++;
+		container.box++;
+		format++;
 	}
-	va_end(ptr);
-	return (n);
+	return (write_print(container, args));
+}
+
+/**
+ * write_print - Writes and frees the buffer to standard output
+ * @container: the string to be printed, may contain conversion specifiers
+ * which placehold for other data types to be printed
+ * @args: the args
+ * Return: The number of characters printed.
+ */
+int write_print(mk_buffer container, va_list args)
+{
+	write(1, container.start, container.size);
+	free(container.start);
+	va_end(args);
+
+	return (container.size);
 }
