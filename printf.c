@@ -43,6 +43,7 @@ int _printf(const char *format, ...)
 					print_int(&n, va_arg(ptr, int));
 					break;
 				default:
+					write(1, format + i - 1, 2);
 					break;
 			}
 		}
